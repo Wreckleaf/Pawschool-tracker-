@@ -1,0 +1,128 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121c39; /* Dark background */
+    color: #f0f8ff; /* Light blue text */
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #87cefa; /* Light blue heading */
+    margin-top: 20px;
+}
+
+.input-container {
+    margin-top: 30px;
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 12px;
+    margin: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    width: 220px;
+    background-color: #1a2a50; /* Darker blue for input fields */
+    color: #f0f8ff;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #4b8df8; /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #3b7edc;
+}
+
+#dogList {
+    margin-top: 30px;
+}
+
+.dog-item {
+    background-color: #1a2a50; /* Dark blue background for dog item */
+    padding: 12px;
+    margin: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #f0f8ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn, .pause-btn, .resume-btn {
+    background: transparent;
+    border: none;
+    color: #f0f8ff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.delete-btn:hover, .pause-btn:hover, .resume-btn:hover {
+    color: #ff6347; /* Light red hover effect */
+}
+
+.dog-item button {
+    padding: 5px;
+}
+
+.device-prompt {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #121c39;
+    color: #f0f8ff;
+}
+
+.device-prompt h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.device-prompt button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 18px;
+    background-color: #4b8df8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.device-prompt button:hover {
+    background-color: #3b7edc;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .input-container input,
+    .input-container button {
+        width: 100%;
+    }
+
+    .dog-item {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .device-prompt button {
+        width: 200px;
+        font-size: 16px;
+    }
+}
