@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawschool Remaining Days</title>
+    <style>
+        /* CSS styles for dark mode and layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #d1d1d1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #6db9f3;
+        }
+
+        #devicePrompt {
+            display: block;
+        }
+
+        #mainContent {
+            display: none;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .dog-item {
+            background-color: #2a2a2a;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            border: none;
+            color: #f44336;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .pause-btn {
+            background-color: #6db9f3;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pause-btn:hover {
+            background-color: #4f97a3;
+        }
+
+        /* Mobile-friendly layout */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .dog-item {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Device selection screen -->
+    <div id="devicePrompt">
+        <h2>Are you using a mobile or PC?</h2>
+        <button onclick="selectDevice('mobile')">Mobile</button>
+        <button onclick="selectDevice('pc')">PC</button>
+    </div>
+
+    <!-- Main content screen -->
+    <div id="mainContent">
+        <h1>Pawschool Remaining Days</h1>
+
+        <!-- Input form -->
+        <div class="input-container">
+            <input type="text" id="dogName" placeholder="Enter dog's name">
+            <input type="number" id="duration" placeholder="Enter number of days">
+            <button onclick="addDog()">Add Dog</button>
+        </div>
+
+        <div id="dogList"></div>
+    </div>
+
+    <script>
+        // Retrieve dogs from localStorage on page load
+        let dogs = JSON.parse(localStorage.getItem("dogs")) || [];
+
+        // Handle device selection
+        function selectDevice(device) {
+            const devicePrompt = document.getElementById("devicePrompt");
+            const mainContent = document.getElementById("mainContent");
+
+            devicePrompt.style.display = 'none';
+            mainContent.style.display = 'block';
+
+            if (device === 'mobile') {
+                document.body.style.maxWidth = '390px'; // Adjust for mobile screen
+                document.body.style.margin = 'auto';
+            }
+
+            displayDogs(); // Show the dogs when device is selected
+        }
+
+        // Add a dog to the list
+        function addDog() {
+            const dogName = document.getElementById("dogName").value;
+            const duration = parseInt(document.getElementById("duration").value);
+
+            if (dogName && !isNaN(duration) && duration > 0) {
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + duration);
+
+                dogs.push({ name: dogName, duration: duration, endDate: endDate, paused: false, pauseTime: 0 });
+
+                document.getElementById("dogName").value = '';
+                document.getElementById("duration").value = '';
+
+                saveDogs(); // Save the dogs to localStorage
+                displayDogs(); // Re-display the dogs list
+            } else {
+                alert("Please enter a valid dog name and duration.");
+            }
+        }
+
+        // Display dogs and countdown
+        function displayDogs() {
+            const dogList = document.getElementById("dogList");
+            dogList.innerHTML = '';
+
+            dogs.forEach((dog, index) => {
+                const timeLeft = calculateTimeLeft(dog.endDate, dog.paused, dog.pauseTime);
+
+                const dogElement = document.createElement("div");
+                dogElement.classList.add("dog-item");
+                dogElement.innerHTML = `${dog.name} - ${dog.duration} day(s) (${timeLeft}) 
+                    <button onclick="deleteDog(${index})" class="delete-btn">&#128465;</button>
+                    <button onclick="pauseDog(${index})" class="pause-btn">${dog.paused ? 'Resume' : 'Pause'}</button>`;
+                dogList.appendChild(dogElement);
+            });
+        }
+
+        // Save dogs data to localStorage
+        function saveDogs() {
+            localStorage.setItem("dogs", JSON.stringify(dogs));
+        }
+
+        // Calculate time left
+        function calculateTimeLeft(endDate, paused, pauseTime) {
+            const now = new Date();
+            let timeDifference = endDate - now;
+
+            if (paused) {
+                return `${Math.floor(pauseTime / (1000 * 60 * 60 * 24))}d ${Math.floor((pauseTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))}h ${Math.floor((pauseTime % (1000 * 60 * 60)) / (1000 * 60))}m ${Math.floor((pauseTime % (1000 * 60)) / 1000)}s`;
+            }
+
+            if (timeDifference <= 0) {
+                return "Time's up!";
+            }
+
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Delete dog from list
+        function deleteDog(index) {
+            dogs.splice(index, 1); 
+            saveDogs(); // Save the updated dogs list to localStorage
+            displayDogs();
+        }
+
+        // Pause or resume dog countdown
+        function pauseDog(index) {
+            const dog = dogs[index];
+            const now = new Date();
+
+            if (!dog.paused) {
+                dog.paused = true;
+                dog.pauseTime = dog.endDate - now;
+                dog.endDate = now;
+            } else {
+                dog.paused = false;
+                dog.endDate = new Date();
+                dog.endDate.setTime(now.getTime() + dog.pauseTime);
+                dog.pauseTime = 0;
+            }
+
+            saveDogs(); // Save the updated dogs list to localStorage
+            displayDogs();
+        }
+
+        // Display dogs every second
+        setInterval(displayDogs, 1000);
+    </script>
+</body>
+</html>
